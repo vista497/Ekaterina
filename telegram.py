@@ -5,28 +5,37 @@ import time
 import repository_ekaterina as rp
 
 bot = telebot.TeleBot('2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E')
+
 repository=rp.Repository()
 name =""
 surname = ''
 age = 0
 chat_id=0
 status=''
+hello=['привет','здравствуй', 'здарова', 'приветики', 'ку', 'слушай', '', '', '']
 
 @bot.message_handler(content_types=['text', 'audio'])
 
 def start(message):
-    global chat_id, name,surname,age
-    if message.text == '/reg':
-        chat_id= message.from_user.id
-        name, surname, age, tg_id=repository.getPersonById(chat_id)
+    global chat_id, name,surname,age, status
+    chat_id= message.from_user.id
+    name, surname, age, tg_id, status=repository.getPersonById(chat_id)
+    if message.text.lower() in hello:
+            bot.send_message(message.from_user.id, 'Вечер в хату!')
+    if chat_id!=tg_id:
+        login = types.InlineKeyboardButton(text='Регистрация', callback_data='login'); #кнопка «регистрация»
+        keyboard = types.InlineKeyboardMarkup(); #наша клавиатура
+        keyboard.add(login); #добавляем кнопку в клавиатуру
+        bot.send_message(message.from_user.id, text="Я не знаю с кем говорю", reply_markup=keyboard)
+
+    if message.text == '/reg': 
         if chat_id==tg_id:
             bot.send_message(message.from_user.id, "Ты уже зарегестрирован: "+name)
         else: 
             bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
             bot.send_message(message.from_user.id, "Как тебя зовут?")
             bot.register_next_step_handler(message, get_name) #следующий шаг – функция get_name
-    else:
-        bot.send_message(message.from_user.id, 'Напиши /reg')
+
 
 def get_name(message): #получаем фамилию
     global name
@@ -58,7 +67,6 @@ def error_age(message):
         key_no= types.InlineKeyboardButton(text='Нет', callback_data='no')
         keyboard.add(key_no)
         bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
-
         question = 'Тебе '+str(age)+' лет, тебя зовут '+name+' '+surname+'?'
         bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
     except Exception:
@@ -76,5 +84,9 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, 'Запомню, солнышко :)')
     elif call.data == "no":
         bot.send_message(call.message.chat.id, 'Это прискорбно :(')
+    elif call.data == "login":
+            bot.send_chat_action(chat_id=call.message.chat.id, action = 'typing')
+            bot.send_message(call.message.chat.id, "Как тебя зовут?")
+            bot.register_next_step_handler(call.message, get_name) #следующий шаг – функция get_name
         
 bot.polling(none_stop=True, interval=0)

@@ -27,18 +27,20 @@ class Repository():
     def getPersonById(self, tg_id_):
         """Возвращает имя фамилию возраст и айди""" 
         sess=self.db.open()
-        query="select (first_name,last_name, age, tg_id) from ekaterina.people_tg where tg_id="+str(tg_id_)
+        query="select first_name,last_name, age, tg_id, status from ekaterina.people_tg where tg_id="+str(tg_id_)
         sess.execute(query)
-        response = sess.fetchmany()
+        response = sess.fetchall()
         self.db.close()
         if len(response)!=0:
-            first_name=response[0]
-            last_name=response[1]
-            age=response[2]
-            tg_id=response[3]
+            for row in response:
+                first_name=row[0]
+                last_name=row[1]
+                age=row[2]
+                tg_id=row[3]
+                status=row[4]
         else: 
-            first_name, last_name, age, tg_id = "none", "none", 0, "none"
-        return first_name, last_name, age, tg_id
+            first_name, last_name, age, tg_id, status = "none", "none", 0, "none", "none"
+        return first_name, last_name, age, tg_id, status
 
 
         
