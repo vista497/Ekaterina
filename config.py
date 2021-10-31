@@ -3,7 +3,7 @@ from boto.s3.connection import S3Connection
 import os
 
 #DataBase
-class Config:
+class Config():
     def __init__(self) -> None:
         
         self.result=urlparse(S3Connection(os.environ['DATABASE_URL']))
