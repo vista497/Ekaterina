@@ -1,22 +1,22 @@
 import psycopg2
 from psycopg2 import Error
-import config as conf
+import config
 
 
 class DateBase():
     """Обертка для работы с базой данных Екатерины"""
     def __init__(self) -> None:
-        pass
+        self.config=config.Config
 
     def session(self,param, request):
         """Принимает запрос (строкой)"""
         try:
             # Подключение к существующей базе данных
-            self.connection = psycopg2.connect(user=conf.USER,
-                                        password=conf.PASS,
-                                        host=conf.HOST,
-                                        port=conf.PORT,
-                                        database=conf.DATABASE)
+            self.connection = psycopg2.connect(user=self.config.USER,
+                                        password=self.config.PASS,
+                                        host=self.config.HOST,
+                                        port=self.config.PORT,
+                                        database=self.config.DATABASE)
             # Курсор для выполнения операций с базой данных
             self.sess = self.connection.cursor()
 
