@@ -4,8 +4,9 @@ from telebot import types
 import time 
 import config as conf
 import repository_ekaterina as rp
-
-bot = telebot.TeleBot(conf.TELEGRAM)
+key=conf.TELEGRAM
+print(key)
+bot = telebot.TeleBot(key)
 
 repository=rp.Repository()
 name =""
