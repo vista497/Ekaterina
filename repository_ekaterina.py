@@ -21,21 +21,26 @@ class Repository():
     def tgReg(self, firstName, lastName, age, tg_id, status):
         """Добавляет нового пользователя из чат бота"""
 
-        query="insert into people_tg (first_name, last_name, age, tg_id) values ('"+firstName+"', '"+lastName+"','"+str(age)+"','"+str(tg_id)+"','"+status+"')"
+        query="insert into ekaterina.people_tg (first_name, last_name, age, tg_id, status) values ('"+firstName+"', '"+lastName+"','"+str(age)+"','"+str(tg_id)+"','"+status+"')"
         resp=self.db.session(INSERT, query)
 
-    def getPersonById(self, tg_id):
+    def getPersonById(self, tg_id_):
         """Возвращает имя фамилию возраст и айди""" 
         sess=self.db.open()
-        query="select (first_name,last_name, age, tg_id) from person_tg where tg_id="+str(tg_id)
+        query="select (first_name,last_name, age, tg_id) from ekaterina.people_tg where tg_id="+str(tg_id_)
         sess.execute(query)
-        response = sess.fetchone()
+        response = sess.fetchmany()
         self.db.close()
-        first_name=response[0]
-        last_name=response[1]
-        age=response[2]
-        tg_id=response[3]
+        if len(response)!=0:
+            first_name=response[0]
+            last_name=response[1]
+            age=response[2]
+            tg_id=response[3]
+        else: 
+            first_name, last_name, age, tg_id = "none", "none", 0, "none"
         return first_name, last_name, age, tg_id
+
+
         
     
  

@@ -50,19 +50,19 @@ class DateBase():
     
     def open(self):
         # Подключение к существующей базе данных
-        connection = psycopg2.connect(user=USER,
+        self.connection_ = psycopg2.connect(user=USER,
                                         password=PASS,
                                         host=HOST,
                                         port=PORT,
                                         database=DATABASE)
         # Курсор для выполнения операций с базой данных
-        self.connect = connection.cursor()
+        self.connect = self.connection_.cursor()
         return self.connect
 
     def close(self):
-        if self.connection:
-                self.sess.close()
-                self.connection.close()
+        if self.connection_:
+                self.connect.close()
+                self.connection_.close()
                 print("Соединение с PostgreSQL закрыто")
 
 

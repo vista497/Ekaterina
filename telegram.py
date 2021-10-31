@@ -71,7 +71,7 @@ def error_age(message):
 def callback_worker(call):
     global name, surname, age, chat_id, status
     if call.data == "yes": #call.data это callback_data, которую указали при объявлении кнопки
-        
+        status="user"
         repository.tgReg(name, surname, age, chat_id, status)
         bot.send_message(call.message.chat.id, 'Запомню, солнышко :)')
     elif call.data == "no":
