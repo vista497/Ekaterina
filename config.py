@@ -13,5 +13,5 @@ HOST = result.hostname
 PORT = result.port
 
 #ApiKey
-SPEECHKIT=S3Connection(os.environ.get('apiKey_speechKit'))
-TELEGRAM=S3Connection(os.environ.get('apiKey_tg'))
+SPEECHKIT=os.environ.get('apiKey_speechKit')
+TELEGRAM=os.environ.get('apiKey_tg')
