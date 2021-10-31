@@ -1,13 +1,6 @@
 import psycopg2
 from psycopg2 import Error
-
-err=True
-
-HOST="ec2-52-208-221-89.eu-west-1.compute.amazonaws.com"
-DATABASE="da2u9nb473rkqt"
-USER="hhaqhpjyhtobsz"
-PASS="653c803a5d1a7f1cc86856eb1178c01b6ddbe6d16a31d8f760bad12f295444f5"
-PORT="5432"
+import config as conf
 
 
 class DateBase():
@@ -19,11 +12,11 @@ class DateBase():
         """Принимает запрос (строкой)"""
         try:
             # Подключение к существующей базе данных
-            self.connection = psycopg2.connect(user=USER,
-                                        password=PASS,
-                                        host=HOST,
-                                        port=PORT,
-                                        database=DATABASE)
+            self.connection = psycopg2.connect(user=conf.USER,
+                                        password=conf.PASS,
+                                        host=conf.HOST,
+                                        port=conf.PORT,
+                                        database=conf.DATABASE)
             # Курсор для выполнения операций с базой данных
             self.sess = self.connection.cursor()
 
@@ -40,7 +33,7 @@ class DateBase():
 
         except (Exception, Error) as error:
             print("Ошибка при работе с PostgreSQL", error)
-            return err
+            return 1
 
         finally:
             if self.connection:

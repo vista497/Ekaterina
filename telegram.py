@@ -3,8 +3,9 @@ import telebot
 from telebot import types
 import time 
 import repository_ekaterina as rp
+import config as conf
 
-bot = telebot.TeleBot('2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E')
+bot = telebot.TeleBot(conf.TELEGRAM)
 
 repository=rp.Repository()
 name =""
