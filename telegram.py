@@ -6,7 +6,7 @@ import config as conf
 import repository_ekaterina as rp
 key=conf.TELEGRAM
 print(key)
-bot = telebot.TeleBot(key)
+bot = telebot.TeleBot(str(key))
 
 repository=rp.Repository()
 name =""
