@@ -4,11 +4,10 @@ from telebot import types
 import time 
 import config as conf
 import repository_ekaterina as rp
-from boto.s3.connection import S3Connection
 import os
 
 
-bot = telebot.TeleBot(S3Connection(os.environ['apiKey_tg']))
+bot = telebot.TeleBot(os.environ.get('apiKey_tg'))
 
 
 repository=rp.Repository()
