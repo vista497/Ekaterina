@@ -2,10 +2,10 @@
 import telebot
 from telebot import types
 import time 
-#import repository_ekaterina as rp
+import repository_ekaterina as rp
 
 bot = telebot.TeleBot('2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E')
-# repository=rp.Repository()
+repository=rp.Repository()
 name =""
 surname = ''
 age = 0
@@ -18,13 +18,13 @@ def start(message):
     global chat_id, name,surname,age
     if message.text == '/reg':
         chat_id= message.from_user.id
-        # name, surname, age, tg_id=repository.getPersonById(chat_id)
-        # if chat_id==tg_id:
-        #     return bot.send_message(message.from_user.id, "Ты уже зарегестрирован: "+name)
-        bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
-        
-        bot.send_message(message.from_user.id, "Как тебя зовут?")
-        bot.register_next_step_handler(message, get_name) #следующий шаг – функция get_name
+        name, surname, age, tg_id=repository.getPersonById(chat_id)
+        if chat_id==tg_id:
+            bot.send_message(message.from_user.id, "Ты уже зарегестрирован: "+name)
+        else: 
+            bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
+            bot.send_message(message.from_user.id, "Как тебя зовут?")
+            bot.register_next_step_handler(message, get_name) #следующий шаг – функция get_name
     else:
         bot.send_message(message.from_user.id, 'Напиши /reg')
 

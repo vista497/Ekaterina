@@ -3,6 +3,13 @@ from psycopg2 import Error
 
 err=True
 
+HOST="ec2-52-208-221-89.eu-west-1.compute.amazonaws.com"
+DATABASE="da2u9nb473rkqt"
+USER="hhaqhpjyhtobsz"
+PASS="653c803a5d1a7f1cc86856eb1178c01b6ddbe6d16a31d8f760bad12f295444f5"
+PORT="5432"
+
+
 class DateBase():
     """Обертка для работы с базой данных Екатерины"""
     def __init__(self) -> None:
@@ -12,11 +19,11 @@ class DateBase():
         """Принимает запрос (строкой)"""
         try:
             # Подключение к существующей базе данных
-            self.connection = psycopg2.connect(user="postgres",
-                                        password="postgres",
-                                        host="127.0.0.1",
-                                        port="5432",
-                                        database="ekaterinadb")
+            self.connection = psycopg2.connect(user=USER,
+                                        password=PASS,
+                                        host=HOST,
+                                        port=PORT,
+                                        database=DATABASE)
             # Курсор для выполнения операций с базой данных
             self.sess = self.connection.cursor()
 
@@ -43,11 +50,11 @@ class DateBase():
     
     def open(self):
         # Подключение к существующей базе данных
-        connection = psycopg2.connect(user="postgres",
-                                    password="postgres",
-                                    host="127.0.0.1",
-                                    port="5432",
-                                    database="ekaterinadb")
+        connection = psycopg2.connect(user=USER,
+                                        password=PASS,
+                                        host=HOST,
+                                        port=PORT,
+                                        database=DATABASE)
         # Курсор для выполнения операций с базой данных
         self.connect = connection.cursor()
         return self.connect
