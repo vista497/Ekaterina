@@ -1,9 +1,11 @@
 import ekaterina
+import speech_recognition as sr
 
 Kate = ekaterina.Kate
 
 if __name__ == "__main__":
 
+    
     # инициализация инструментов распознавания и ввода речи
     recognizer = sr.Recognizer()
     recognizer.dynamic_energy_threshold = False

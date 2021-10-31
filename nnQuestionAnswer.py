@@ -1,4 +1,3 @@
-import numpy
 import sys
 from collections import Counter
 import pandas as pd
