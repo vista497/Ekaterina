@@ -11,5 +11,5 @@ HOST = result.hostname
 PORT = result.port
 
 #ApiKey
-SPEECHKIT=os.environ['DATABASE_URL']
-TELEGRAM=os.environ['DATABASE_URL']
+SPEECHKIT=os.environ['apiKey_speechKit']
+TELEGRAM=os.environ['apiKey_tg']
