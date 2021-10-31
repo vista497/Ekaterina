@@ -2,10 +2,12 @@
 import telebot
 from telebot import types
 import time 
-import repository_ekaterina as rp
 import config as conf
-
 bot = telebot.TeleBot(conf.TELEGRAM)
+import repository_ekaterina as rp
+
+
+
 
 repository=rp.Repository()
 name =""
