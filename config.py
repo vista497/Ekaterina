@@ -3,8 +3,8 @@ from boto.s3.connection import S3Connection
 import os
 
 #DataBase
-
-result=urlparse(S3Connection(os.environ['DATABASE_URL']))
+url=S3Connection(os.environ['db_Kate'])
+result=urlparse(url)
 USER = result.username
 PASS = result.password
 DATABASE = result.path[1:]
