@@ -5,7 +5,7 @@ import os
 #DataBase
 url=os.environ.get('DATABASE_URL')
 #url=S3Connection(os.environ[DATABASE_URL])
-result=urlparse(url)
+result=urlparse(str(url))
 USER = result.username
 PASS = result.password
 DATABASE = result.path[1:]
