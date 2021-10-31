@@ -8,7 +8,7 @@ from boto.s3.connection import S3Connection
 import os
 
 
-bot = telebot.TeleBot(S3Connection(os.environ.get('apiKey_tg')))
+bot = telebot.TeleBot(S3Connection(os.environ['apiKey_tg']))
 
 
 repository=rp.Repository()
