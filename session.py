@@ -6,17 +6,17 @@ import config
 class DateBase():
     """Обертка для работы с базой данных Екатерины"""
     def __init__(self) -> None:
-        self.config=config.Config
+        pass
 
     def session(self,param, request):
         """Принимает запрос (строкой)"""
         try:
             # Подключение к существующей базе данных
-            self.connection = psycopg2.connect(user=self.config.USER,
-                                        password=self.config.PASS,
-                                        host=self.config.HOST,
-                                        port=self.config.PORT,
-                                        database=self.config.DATABASE)
+            self.connection = psycopg2.connect(user=config.USER,
+                                        password=config.PASS,
+                                        host=config.HOST,
+                                        port=config.PORT,
+                                        database=config.DATABASE)
             # Курсор для выполнения операций с базой данных
             self.sess = self.connection.cursor()
 

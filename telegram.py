@@ -5,8 +5,7 @@ import time
 import repository_ekaterina as rp
 import config as conf
 
-tg=conf.Config()
-bot = telebot.TeleBot(tg.TELEGRAM)
+bot = telebot.TeleBot(conf.TELEGRAM)
 
 repository=rp.Repository()
 name =""
