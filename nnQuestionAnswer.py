@@ -9,8 +9,8 @@ import numpy as np
 import random
 import torch.optim as optim
 
-from torchtext.legacy.datasets import Multi30k
-from torchtext.legacy.data import Field, BucketIterator
+# from torchtext.legacy.datasets import Multi30k
+# from torchtext.legacy.data import Field, BucketIterator
 
 #import spacy
 import numpy as np
@@ -19,8 +19,27 @@ import random
 import math
 import time
 
+#from google.colab import files # модуль для загрузки файлов в colab
+
+# from tensorflow.keras.models import Model, load_model, Sequential # из кераса подгружаем абстрактный класс базовой модели, метод загрузки предобученной модели
+# from tensorflow.keras.layers import Dense, Embedding, LSTM, GRU, Input, TimeDistributed, RepeatVector # из кераса загружаем необходимые слои для нейросети
+# from tensorflow.keras.optimizers import RMSprop, Nadam # из кераса загружаем выбранный оптимизатор
+# from tensorflow.keras.preprocessing.sequence import pad_sequences # загружаем метод ограничения последовательности заданной длиной
+# from tensorflow.keras.preprocessing.text import Tokenizer # загружаем токенизатор кераса для обработки текста
+# from tensorflow.keras import utils # загружаем утилиты кераса для one hot кодировки
+# from tensorflow.keras.utils import plot_model # удобный график для визуализации архитектуры модели
+# import os
+# import re
+# import tensorflow.keras as keras
+# import sys
+# import time
+# from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
+
 PATH='weights_only.pth'
-TRAIN_TEXT_FILE_PATH = 'dialogues.txt'
+TRAIN_TEXT_FILE_PATH = 'forparser.txt'
+START_TOKEN = '<start>'
+END_TOKEN = '<end>'
 
 SEED = 1234
 
@@ -42,13 +61,31 @@ n=0
 # rep= good[good.context_0=='да'].reply
 # if rep.shape[0]>0:
 #     print(rep.sample(1).iloc[0])
+text_sample=''
+pre_question=[]
+answer=[]
+# парсер диалогов
 
-
-
-# открытие файла
-with open(TRAIN_TEXT_FILE_PATH) as text_file:
+# with open(TRAIN_TEXT_FILE_PATH) as text_file:
+#         text_sample = text_file.readlines()
+#     # text_sample = ' '.join(text_sample)
+with open(TRAIN_TEXT_FILE_PATH,encoding='utf-8') as text_file:
     text_sample = text_file.readlines()
-text_sample = ' '.join(text_sample)
+    for x in text_sample:
+        T=''
+        Q=''
+        if x[0]=='T':
+            T=x
+        if x[0]=='Q':
+            Q=x
+            pre_question.append(T+'/'+Q)
+        if x[0]=='A':
+            answer.append(x)
+print (len(pre_question))
+print (len(answer))
+
+
+
 
 # разбитие текста на цифру (прямой и обратный соловари)
 def text_to_seq(text_sample):
@@ -160,7 +197,11 @@ class Seq2Seq(nn.Module):
         assert encoder.hid_dim == decoder.hid_dim, \
             "Скрытые размеры кодера и декодера должны быть равны!"
         assert encoder.n_layers == decoder.n_layers, \
-            "Кодер и декодер должны иметь одинаковое количество слоев!"        
+            "Кодер и декодер должны иметь одинаковое количество слоев!"  
+
+
+
+
     def forward(self, src, trg, teacher_forcing_ratio = 0.5):
         
         #src = [src len, batch size]
@@ -203,8 +244,8 @@ class Seq2Seq(nn.Module):
         return outputs
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-INPUT_DIM = len(SRC.vocab)
-OUTPUT_DIM = len(TRG.vocab)
+INPUT_DIM = 256
+OUTPUT_DIM = 256
 ENC_EMB_DIM = 256
 DEC_EMB_DIM = 256
 HID_DIM = 512
@@ -212,13 +253,20 @@ N_LAYERS = 2
 ENC_DROPOUT = 0.5
 DEC_DROPOUT = 0.5
 
-enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, N_LAYERS, ENC_DROPOUT)
-dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, N_LAYERS, DEC_DROPOUT)
+enc = Encoder(INPUT_DIM, 
+             ENC_EMB_DIM,
+             HID_DIM, 
+             N_LAYERS, 
+             ENC_DROPOUT)
+dec = Decoder(OUTPUT_DIM, 
+             DEC_EMB_DIM, 
+             HID_DIM, N_LAYERS, 
+             DEC_DROPOUT)
 
 model = Seq2Seq(enc, dec, device).to(device)
 
 
-model = Seq2Seq(input_size=len(idx_to_char), hidden_size=128, embedding_size=128, n_layers=2)
+# model = Seq2Seq(input_size=len(idx_to_char), hidden_size=128, embedding_size=128, n_layers=2)
 model.to(device)
 
 # функция потерь
