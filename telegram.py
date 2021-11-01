@@ -7,7 +7,7 @@ import repository_ekaterina as rp
 import os
 
 
-bot = telebot.TeleBot(str(os.environ.get('apiKey_tg')))
+bot = telebot.TeleBot('"'+os.environ.get('apiKey_tg')+'"')
 
 
 repository=rp.Repository()
