@@ -2,12 +2,12 @@
 import telebot
 from telebot import types
 import time 
-import config as conf
+from config import TELEGRAM
 import repository_ekaterina as rp
 import os
 
 
-bot = telebot.TeleBot(str(os.environ.get('apiKey_tg', None)))
+bot = telebot.TeleBot(TELEGRAM)
 
 
 repository=rp.Repository()

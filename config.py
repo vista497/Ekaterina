@@ -1,10 +1,12 @@
 from urllib.parse import urlparse
 from boto.s3.connection import S3Connection
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #DataBase
 url=os.environ.get('DATABASE_URL')
-#url=S3Connection(os.environ[DATABASE_URL])
 result=urlparse(str(url))
 USER = result.username
 PASS = result.password
