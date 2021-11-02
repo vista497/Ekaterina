@@ -43,11 +43,11 @@ class DateBase():
     
     def open(self):
         # Подключение к существующей базе данных
-        self.connection_ = psycopg2.connect(user=USER,
-                                        password=PASS,
-                                        host=HOST,
-                                        port=PORT,
-                                        database=DATABASE)
+        self.connection_ = psycopg2.connect(user=config.USER,
+                                        password=config.PASS,
+                                        host=config.HOST,
+                                        port=config.PORT,
+                                        database=config.DATABASE)
         # Курсор для выполнения операций с базой данных
         self.connect = self.connection_.cursor()
         return self.connect

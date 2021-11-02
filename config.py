@@ -15,5 +15,5 @@ HOST = result.hostname
 PORT = result.port
 
 #ApiKey
-SPEECHKIT=os.environ.get('apiKey_speechKit')
-TELEGRAM=os.environ.get('apiKey_tg')
+#SPEECHKIT=os.environ.get('apiKey_speechKit')
+TELEGRAM=os.environ.get('API_TG')
