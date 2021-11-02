@@ -7,7 +7,7 @@ import repository_ekaterina as rp
 import os
 
 
-bot = telebot.TeleBot(str(TELEGRAM))
+bot = telebot.TeleBot(TELEGRAM)
 
 
 repository=rp.Repository()
