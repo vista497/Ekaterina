@@ -16,4 +16,4 @@ PORT = result.port
 
 #ApiKey
 #SPEECHKIT=os.environ.get('apiKey_speechKit')
-TELEGRAM=os.environ.get('API_TG')
+TELEGRAM='2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E'
