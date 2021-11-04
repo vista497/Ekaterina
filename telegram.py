@@ -1,14 +1,13 @@
-
 import telebot
 from telebot import types
 import time 
 import config
 import repository_ekaterina as rp
-import os
-
+import subprocess
+import speech_recognition as sr
+from ekaterina import Kate
 
 bot = telebot.TeleBot(config.TELEGRAM)
-
 
 repository=rp.Repository()
 name =""
@@ -20,40 +19,56 @@ hello=['привет','здравствуй', 'здарова', 'привети�
 
 @bot.message_handler(commands=['start'])
 def starting(message):
-    bot.send_message(  
-        message.chat.id,  
-        'Greetings! I can show you exchange rates.\n' +  
-        'To get the exchange rates press /exchange.\n' +  
-        'To get help press /help.'  
-  )
-
-@bot.message_handler(content_types=['text', 'audio'])
-
-def start(message):
     global chat_id, name,surname,age, status
     chat_id= message.from_user.id
     name, surname, age, tg_id, status=repository.getPersonById(chat_id)
-    if message.text.lower() in hello and chat_id==tg_id:
-            bot.send_message(message.from_user.id, 'Вечер в хату! '+name)
     if chat_id!=tg_id:
         login = types.InlineKeyboardButton(text='Регистрация', callback_data='login'); #кнопка «регистрация»
         keyboard = types.InlineKeyboardMarkup(); #наша клавиатура
         keyboard.add(login); #добавляем кнопку в клавиатуру
         bot.send_message(message.from_user.id, text="Я не знаю с кем говорю", reply_markup=keyboard)
 
-    if message.text == '/reg': 
-        if chat_id==tg_id:
-            bot.send_message(message.from_user.id, "Ты уже зарегестрирован: "+name)
-        else: 
-            bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
-            bot.send_message(message.from_user.id, "Как тебя зовут?")
-            bot.register_next_step_handler(message, get_name) #следующий шаг – функция get_name
+@bot.message_handler(commands=['reg'])
+def reg(message):
+    global chat_id, name,surname,age, status
+    chat_id= message.from_user.id
+    name, surname, age, tg_id, status=repository.getPersonById(chat_id)
+    if chat_id==tg_id:
+        bot.send_message(message.from_user.id, "Ты уже зарегестрирован: "+name)
+    else: 
+        bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
+        bot.send_message(message.from_user.id, "Как тебя зовут?")
+        bot.register_next_step_handler(message, get_name) #следующий шаг – функция get_name
+
+@bot.message_handler(content_types=['text'])
+def messages(message):
+    global chat_id, name,surname,age, status
+    chat_id= message.from_user.id
+    name, surname, age, tg_id, status=repository.getPersonById(chat_id)
+    if message.text.lower() in hello and chat_id==tg_id:
+            bot.send_message(message.from_user.id, 'Вечер в хату! '+name)
+
+@bot.message_handler(content_types=['voice'])  
+def voices(message):
+    fileID=message.voice.file_id
+    file=bot.get_file(fileID)
+    down_file=bot.download_file(file.file_path)
+    with open('audio.ogg', 'wb') as f:
+        f.write(down_file)
+    process=subprocess.run(['ffmpeg', '-i', 'audio.ogg', 'audio.wav', '-y'])
+
+    file = sr.AudioFile('audio.wav')
+    recognizer = sr.Recognizer()
+    k=Kate()
+    with file as source:
+        audio = recognizer.record(source)
+        text=k.callback(recognizer, audio)
+        bot.send_message(message.from_user.id, text)
 
 
 def get_name(message): #получаем фамилию
     global name
     name = message.text
-    
     bot.send_chat_action(chat_id=message.from_user.id, action = 'typing')
     bot.send_message(message.from_user.id, 'А фамилия?')
     bot.register_next_step_handler(message, get_surname)
@@ -102,8 +117,7 @@ def callback_worker(call):
         bot.register_next_step_handler(call.message, get_name)
     elif call.data == "login":
             bot.send_chat_action(chat_id=call.message.chat.id, action = 'typing')
-            bot.send_message(call.message.chat.id, "Как тебя зовут?")
-            bot.register_next_step_handler(call.message, get_name)
+            bot.register_next_step_handler(call.message, reg)
 
 
 
