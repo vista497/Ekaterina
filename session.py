@@ -24,7 +24,7 @@ class DateBase():
             
             if param=="select":
                 self.sess.execute(request)
-                response = self.sess.fetchone()
+                response = self.sess.fetchall()
                 return response
             if param=="insert":
                 self.sess.execute(request)
@@ -33,7 +33,7 @@ class DateBase():
 
         except (Exception, Error) as error:
             print("Ошибка при работе с PostgreSQL", error)
-            return 1
+            return error
 
         finally:
             if self.connection:
@@ -43,17 +43,17 @@ class DateBase():
     
     def open(self):
         # Подключение к существующей базе данных
-        self.connection_ = psycopg2.connect(user=config.USER,
+        self.con = psycopg2.connect(user=config.USER,
                                         password=config.PASS,
                                         host=config.HOST,
                                         port=config.PORT,
                                         database=config.DATABASE)
         # Курсор для выполнения операций с базой данных
-        self.connect = self.connection_.cursor()
-        return self.connect
+        cur= self.con.cursor()
+        return cur
 
     def close(self):
-        if self.connection_:
+        if self.con:
                 self.connect.close()
                 self.connection_.close()
                 print("Соединение с PostgreSQL закрыто")

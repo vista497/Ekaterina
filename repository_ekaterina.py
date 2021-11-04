@@ -26,11 +26,9 @@ class Repository():
 
     def getPersonById(self, tg_id_):
         """Возвращает имя фамилию возраст и айди""" 
-        sess=self.db.open()
+
         query="select first_name,last_name, age, tg_id, status from ekaterina.people_tg where tg_id="+str(tg_id_)
-        sess.execute(query)
-        response = sess.fetchall()
-        self.db.close()
+        response =self.db.session(SELECT, query)
         if len(response)!=0:
             for row in response:
                 first_name=row[0]
