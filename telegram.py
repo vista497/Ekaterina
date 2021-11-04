@@ -6,6 +6,7 @@ import repository_ekaterina as rp
 import subprocess
 import speech_recognition as sr
 from ekaterina import Kate
+import os
 
 bot = telebot.TeleBot(config.TELEGRAM)
 
@@ -50,21 +51,34 @@ def messages(message):
 
 @bot.message_handler(content_types=['voice'])  
 def voices(message):
-    fileID=message.voice.file_id
-    file=bot.get_file(fileID)
-    down_file=bot.download_file(file.file_path)
-    time.sleep(4)
-    with open('audio.ogg', 'wb') as f:
-        f.write(down_file)
-    process=subprocess.run(['ffmpeg', '-i', 'audio.ogg', 'audio.wav', '-y'])
+    # fileID=message.voice.file_id
+    # file=bot.get_file(fileID)
+    # down_file=bot.download_file(file.file_path)
+    # with open('audio.ogg', 'wb') as f:
+    #     f.write(down_file)
+    # #process=subprocess.run(['ffmpeg', '-i', 'audio.ogg', 'audio.wav', '-y'])
 
-    file_ = sr.AudioFile('audio.wav')
+    # os.system("ffmpeg -i audio.ogg audio.wav")
+
+    # file_ = sr.AudioFile('audio.wav')
     recognizer = sr.Recognizer()
-    k=Kate()
-    with file_ as source:
-        audio = recognizer.record(source)
-        text=k.callback(recognizer, audio)
-        bot.send_message(message.from_user.id, text)
+    # k=Kate()
+    # with file_ as source:
+    #     audio = recognizer.record(source)
+    #     text=k.callback(recognizer, audio)
+    #     bot.send_message(message.from_user.id, text)
+    filename = "qwerty"
+    file_name_full="./voice/"+filename+".ogg"
+    file_name_full_converted="./ready/"+filename+".wav"
+    file_info = bot.get_file(message.voice.file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    with open(file_name_full, 'wb') as new_file:
+        new_file.write(downloaded_file)
+    os.system("ffmpeg -i "+file_name_full+"  "+file_name_full_converted)
+    text=recognizer(file_name_full_converted)
+    bot.reply_to(message, text)
+    os.remove(file_name_full)
+    os.remove(file_name_full_converted)
 
 
 def get_name(message): #получаем фамилию
