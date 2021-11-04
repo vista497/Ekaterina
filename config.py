@@ -17,7 +17,7 @@ PORT = result.port
 
 #ApiKey
 #SPEECHKIT=os.environ.get('apiKey_speechKit')
-TELEGRAM=S3Connection(os.environ.get('API_TG'))
+TELEGRAM=S3Connection(os.environ['API_TG'])
 logging.info(TELEGRAM)
 print (TELEGRAM)
 #TELEGRAM='2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E'
