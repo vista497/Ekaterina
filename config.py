@@ -1,5 +1,4 @@
 from urllib.parse import urlparse
-from boto.s3.connection import S3Connection
 import os
 from dotenv import load_dotenv
 
