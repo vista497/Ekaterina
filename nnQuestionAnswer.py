@@ -19,21 +19,6 @@ import random
 import math
 import time
 
-#from google.colab import files # модуль для загрузки файлов в colab
-
-# from tensorflow.keras.models import Model, load_model, Sequential # из кераса подгружаем абстрактный класс базовой модели, метод загрузки предобученной модели
-# from tensorflow.keras.layers import Dense, Embedding, LSTM, GRU, Input, TimeDistributed, RepeatVector # из кераса загружаем необходимые слои для нейросети
-# from tensorflow.keras.optimizers import RMSprop, Nadam # из кераса загружаем выбранный оптимизатор
-# from tensorflow.keras.preprocessing.sequence import pad_sequences # загружаем метод ограничения последовательности заданной длиной
-# from tensorflow.keras.preprocessing.text import Tokenizer # загружаем токенизатор кераса для обработки текста
-# from tensorflow.keras import utils # загружаем утилиты кераса для one hot кодировки
-# from tensorflow.keras.utils import plot_model # удобный график для визуализации архитектуры модели
-# import os
-# import re
-# import tensorflow.keras as keras
-# import sys
-# import time
-# from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 
 PATH='weights_only.pth'
@@ -66,9 +51,6 @@ pre_question=[]
 answer=[]
 # парсер диалогов
 
-# with open(TRAIN_TEXT_FILE_PATH) as text_file:
-#         text_sample = text_file.readlines()
-#     # text_sample = ' '.join(text_sample)
 with open(TRAIN_TEXT_FILE_PATH,encoding='utf-8') as text_file:
     text_sample = text_file.readlines()
     for x in text_sample:
@@ -81,9 +63,6 @@ with open(TRAIN_TEXT_FILE_PATH,encoding='utf-8') as text_file:
             pre_question.append(T+'/'+Q)
         if x[0]=='A':
             answer.append(x)
-print (len(pre_question))
-print (len(answer))
-
 
 
 
@@ -93,14 +72,22 @@ def text_to_seq(text_sample):
     char_counts = sorted(char_counts.items(), key = lambda x: x[1], reverse=True)
 
     sorted_chars = [char for char, _ in char_counts]
-    print(sorted_chars)
+    # print(sorted_chars)
     char_to_idx = {char: index for index, char in enumerate(sorted_chars)}
     idx_to_char = {v: k for k, v in char_to_idx.items()}
     sequence = np.array([char_to_idx[char] for char in text_sample])
     
     return sequence, char_to_idx, idx_to_char
 
-sequence, char_to_idx, idx_to_char = text_to_seq(text_sample)
+
+def id_to_char(char_to_idx):
+    idx_to_char = {v: k for k, v in char_to_idx.items()}
+    return idx_to_char
+
+
+sequence, char_to_idxQ, idx_to_char = text_to_seq(pre_question)
+
+sequence, char_to_idxA, idx_to_char = text_to_seq(answer)
 
 # кодер
 class Encoder(nn.Module):
@@ -244,8 +231,8 @@ class Seq2Seq(nn.Module):
         return outputs
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-INPUT_DIM = 256
-OUTPUT_DIM = 256
+INPUT_DIM = len(char_to_idxQ)
+OUTPUT_DIM = len(char_to_idxA)
 ENC_EMB_DIM = 256
 DEC_EMB_DIM = 256
 HID_DIM = 512
@@ -260,13 +247,12 @@ enc = Encoder(INPUT_DIM,
              ENC_DROPOUT)
 dec = Decoder(OUTPUT_DIM, 
              DEC_EMB_DIM, 
-             HID_DIM, N_LAYERS, 
+             HID_DIM,
+             N_LAYERS, 
              DEC_DROPOUT)
 
 model = Seq2Seq(enc, dec, device).to(device)
 
-
-# model = Seq2Seq(input_size=len(idx_to_char), hidden_size=128, embedding_size=128, n_layers=2)
 model.to(device)
 
 # функция потерь
@@ -277,5 +263,117 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-2, amsgrad=True)
 n_epochs = 50000
 loss_avg = []
 
-for epoch in range(n_epochs):
+def init_weights(m):
+    for name, param in m.named_parameters():
+        nn.init.uniform_(param.data, -0.08, 0.08)
+        
+model.apply(init_weights)
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+print(f'The model has {count_parameters(model):,} trainable parameters')
+
+def train(model, iterator, optimizer, criterion, clip):
     model.train()
+    epoch_loss = 0
+    for i, batch in enumerate(iterator):
+        src = batch.src
+        trg = batch.trg
+        
+        optimizer.zero_grad()
+        
+        output = model(src, trg)
+        
+        #trg = [trg len, batch size]
+        #output = [trg len, batch size, output dim]
+        
+        output_dim = output.shape[-1]
+        
+        output = output[1:].view(-1, output_dim)
+        trg = trg[1:].view(-1)
+        
+        #trg = [(trg len - 1) * batch size]
+        #output = [(trg len - 1) * batch size, output dim]
+        
+        loss = criterion(output, trg)
+        
+        loss.backward()
+        
+        torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
+        
+        optimizer.step()
+        
+        epoch_loss += loss.item()
+        
+    return epoch_loss / len(iterator)
+
+def evaluate(model, iterator, criterion):
+    
+    model.eval()
+    
+    epoch_loss = 0
+    
+    with torch.no_grad():
+    
+        for i, batch in enumerate(iterator):
+
+            src = batch.src
+            trg = batch.trg
+
+            output = model(src, trg, 0) #turn off teacher forcing
+
+            #trg = [trg len, batch size]
+            #output = [trg len, batch size, output dim]
+
+            output_dim = output.shape[-1]
+            
+            output = output[1:].view(-1, output_dim)
+            trg = trg[1:].view(-1)
+
+            #trg = [(trg len - 1) * batch size]
+            #output = [(trg len - 1) * batch size, output dim]
+
+            loss = criterion(output, trg)
+            
+            epoch_loss += loss.item()
+        
+    return epoch_loss / len(iterator)
+
+#функция которая сообщает сколько времени занимает 1 эпоха
+def epoch_time(start_time, end_time):
+    elapsed_time = end_time - start_time
+    elapsed_mins = int(elapsed_time / 60)
+    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
+    return elapsed_mins, elapsed_secs
+
+N_EPOCHS = 10
+CLIP = 1
+
+best_valid_loss = float('inf')
+
+for epoch in range(N_EPOCHS):
+    
+    start_time = time.time()
+    
+    train_loss = train(model, train_iterator, optimizer, criterion, CLIP)
+    valid_loss = evaluate(model, valid_iterator, criterion)
+    
+    end_time = time.time()
+    
+    epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+    
+    if valid_loss < best_valid_loss:
+        best_valid_loss = valid_loss
+        torch.save(model.state_dict(), 'tut1-model.pt')
+    
+    print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
+    print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
+    print(f'\t Val. Loss: {valid_loss:.3f} |  Val. PPL: {math.exp(valid_loss):7.3f}')
+
+
+model.load_state_dict(torch.load('tut1-model.pt'))
+
+test_loss = evaluate(model, test_iterator, criterion)
+
+print(f'| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |')

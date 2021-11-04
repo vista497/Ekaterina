@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 from boto.s3.connection import S3Connection
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
@@ -16,4 +17,6 @@ PORT = result.port
 
 #ApiKey
 #SPEECHKIT=os.environ.get('apiKey_speechKit')
-TELEGRAM='2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E'
+TELEGRAM=os.environ.get('API_TG')
+logging.info(TELEGRAM)
+#TELEGRAM='2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E'
