@@ -12,11 +12,6 @@ PASS = result.password
 DATABASE = result.path[1:]
 HOST = result.hostname
 PORT = result.port
-print (USER)
-print (PASS)
-print (DATABASE)
-print (HOST)
-print (PORT)
 
 #ApiKey
 #SPEECHKIT=os.environ.get('apiKey_speechKit')

@@ -18,6 +18,15 @@ chat_id=0
 status=''
 hello=['привет','здравствуй', 'здарова', 'приветики', 'ку', 'слушай', '', '', '']
 
+@bot.message_handler(commands=['start'])
+def starting(message):
+    bot.send_message(  
+        message.chat.id,  
+        'Greetings! I can show you exchange rates.\n' +  
+        'To get the exchange rates press /exchange.\n' +  
+        'To get help press /help.'  
+  )
+
 @bot.message_handler(content_types=['text', 'audio'])
 
 def start(message):
