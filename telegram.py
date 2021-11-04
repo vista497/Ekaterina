@@ -53,14 +53,15 @@ def voices(message):
     fileID=message.voice.file_id
     file=bot.get_file(fileID)
     down_file=bot.download_file(file.file_path)
+    time.sleep(4)
     with open('audio.ogg', 'wb') as f:
         f.write(down_file)
     process=subprocess.run(['ffmpeg', '-i', 'audio.ogg', 'audio.wav', '-y'])
 
-    file = sr.AudioFile('audio.wav')
+    file_ = sr.AudioFile('audio.wav')
     recognizer = sr.Recognizer()
     k=Kate()
-    with file as source:
+    with file_ as source:
         audio = recognizer.record(source)
         text=k.callback(recognizer, audio)
         bot.send_message(message.from_user.id, text)
