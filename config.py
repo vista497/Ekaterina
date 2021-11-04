@@ -19,4 +19,5 @@ PORT = result.port
 #SPEECHKIT=os.environ.get('apiKey_speechKit')
 TELEGRAM=os.environ.get('API_TG')
 logging.info(TELEGRAM)
+print (TELEGRAM)
 #TELEGRAM='2088636244:AAHGkiVJZpvWAKwmtWJ3-KAIhiZ8x90U-2E'
